@@ -1,0 +1,125 @@
+﻿@model TestMVC.Models.Transaction
+
+@if (Model != null)
+{
+    <h2>Your Order</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Order Qty</th>
+                <th>Total Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 0;
+            }
+            @foreach (var item in Model.Orders)
+            {
+                i++;
+                <tr>
+                    <td>@i</td>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Product.Price</td>
+                    <td>@item.Qty</td>
+                    <td>@item.TotalAmount</td>
+                    <td class="d-flex gap-2">
+                        <form asp-action="UpdateQty" method="post">
+                            <input type="hidden" value="@item.Id" name="orderId" />
+                            <input type="hidden" value="0" name="mode" />
+                            <button id="btnDel" class="btn btn-link text-primary text-decoration-none m-0 p-0" type="submit">Increase</button>
+                        </form>
+                        <form asp-action="UpdateQty" method="post">
+                            <input type="hidden" value="@item.Id" name="orderId" />
+                            <input type="hidden" value="1" name="mode" />
+                            <button id="btnDel" class="btn btn-link text-secondary text-decoration-none m-0 p-0" type="submit">Decrease</button>
+                        </form>
+                        <form asp-action="Delete" method="post" onsubmit="return confirm('Delete Order Item?');">
+                            <input type="hidden" value="@item.Id" name="orderId" />
+                            <button id="btnDel" class="btn btn-link text-danger text-decoration-none m-0 p-0" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+
+            @if (Model != null)
+            {
+                var total = Model.Orders.Sum(x => x.TotalAmount);
+                <tr class="fw-bold">
+                    <td colspan="4" class="text-end">Total</td>
+                    <td>@total</td>
+                    <td></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex gap-2">
+        <form asp-action="CancelTrans" method="post" onsubmit="return confirm('Delete Transaction?');">
+            <input type="hidden" value="@Model.Id" name="id" />
+            <button id="btnDel" class="btn btn-danger" type="submit">Delete</button>
+        </form>
+        <form asp-action="SaveTrans" method="post" onsubmit="return confirm('Save Transaction?');">
+            <input type="hidden" value="@Model.Id" name="id" />
+            <button id="btnSave" class="btn btn-primary" type="submit">Save</button>
+        </form>
+    </div>
+}
+else @if (ViewData["list"] != null && (ViewData["list"] as List<Transaction>).Count > 0)
+{
+    <h2>Transaction History</h2>
+
+    <ul class="list-group">
+        @foreach (var tr in (ViewData["list"] as List<Transaction>))
+        {
+            <li class="list-group-item">
+                <h4>@(tr.CreatedAt.ToString("yyyy-MM-dd"))</h4>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Transaction ID</th>
+                            <th>Product Name</th>
+                            <th>Price</th>
+                            <th>Order Qty</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int i = 0;
+                        }
+                        @foreach (var item in tr.Orders)
+                        {
+                            i++;
+                            <tr>
+                                <td>@i</td>
+                                <td>@tr.Id</td>
+                                <td>@item.Product.Name</td>
+                                <td>@item.Product.Price</td>
+                                <td>@item.Qty</td>
+                                <td>@item.TotalAmount</td>
+                            </tr>
+                        }
+                        @{
+                            var total = tr.Orders.Sum(x => x.TotalAmount);
+                            <tr class="fw-bold">
+                                <td colspan="5" class="text-end">Total</td>
+                                <td>@total</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <h2>Empty!, add some product to cart</h2>
+}

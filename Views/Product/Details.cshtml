@@ -1,0 +1,33 @@
+﻿@{
+}
+
+@model TestMVC.Models.Product
+
+<div class="d-flex flex-column gap-1">
+   <div class="d-flex gap-2">
+       <p class="my-0">Id : </p>
+       <span class="text-muted text-sm">@Model.Id</span>
+   </div>
+    <div class="d-flex gap-2">
+        <p class="my-0">Name : </p>
+        <span class="text-muted text-sm">@Model.Name</span>
+    </div>
+    <div class="d-flex gap-2">
+        <p class="my-0">Description : </p>
+        <span class="text-muted text-sm">@Model.Description</span>
+    </div>
+    <div class="d-flex gap-2">
+        <p class="my-0">Price : </p>
+        <span class="text-muted text-sm">@Model.Price</span>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a class="btn btn-secondary" asp-action="Index">Back</a>
+        <form asp-action="Delete" method="post" onsubmit="return confirm('Delete Product ?')">
+            <input type="hidden" value="@Model.Id" name="id"/>
+            <button class="btn btn-danger" type="submit">Delete</button>
+        </form>
+        <a class="btn btn-primary" asp-action="Form" asp-route-id="@Model.Id">Update</a>
+
+    </div>
+</div>

@@ -1,0 +1,151 @@
+﻿@using System.Text.Json
+@model List<TestMVC.Models.Product>
+
+<h2>Products</h2>
+<div class="d-flex gap-2">
+    <div><a class="btn btn-primary" asp-action="Form">New</a></div>
+    <div><button onclick="download();" class="btn btn-info" type="button">Download</button></div>
+    <div><button onclick="downloadPdf();" class="btn btn-warning" type="button">Download PDF</button></div>
+    <div class="ms-auto">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data">
+            <div class="input-group mb-3">
+                <input type="file" class="form-control" name="file">
+                <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Upload</button>
+                <button onclick="template();" class="btn btn-primary" type="button">Template</button>
+            </div>
+        </form>
+    </div>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Total Order</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var jsonItem = JsonSerializer.Serialize(item, new JsonSerializerOptions
+                {
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+                });
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.Price</td>
+                <td>@item.OrderQty</td>
+                <td class="d-flex gap-4 align-items-center justify-content-center fw-bold">
+                    <a class="text-dark text-decoration-none" asp-action="Details" asp-route-id="@item.Id">View</a>
+                    <a class="text-primary text-decoration-none" asp-action="Form" asp-route-id="@item.Id">Edit</a>
+                    <form asp-action="Delete" method="post" onsubmit="return confirm('Delete Product?');">
+                        <input type="hidden" value="@item.Id" name="id" />
+                        <button id="btnDel" class="btn btn-link text-danger text-decoration-none m-0 p-0" type="submit">Delete</button>
+                    </form>
+
+                    <form onsubmit='return addOrder(event, @Html.Raw(jsonItem))'>
+                        <button class="btn btn-link text-info text-decoration-none m-0 p-0" type="submit">Add To Cart</button>
+                    </form>
+                    @* <form asp-controller="Order" asp-action="Create" method="post" onsubmit="return addOrder(event,@Html.Raw(jsonItem));"> *@
+                    @*     <button class="btn btn-link text-info text-decoration-none m-0 p-0" type="submit">Add To Cart</button> *@
+                    @* </form> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        async function addOrder(e, item) {
+            e.preventDefault();
+
+            var data = {productId : item.Id, Product : {...item}};
+
+            var res = await fetch("/Order/Create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                return true;
+            })
+            .catch(err => {
+                console.error(err)
+                return false;
+            });
+
+            if (res) {
+                window.location.reload();
+            }
+
+            return res;
+        }
+
+        async function download() {
+            var res = await fetch("/Product/Download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(@Html.Raw(ViewBag.Products))
+            })
+            .then(res => res.blob())
+            .then(res => {
+                const url = window.URL.createObjectURL(res);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "report.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(err => {
+                console.error(err)
+            });
+        }
+
+        async function downloadPdf() {
+            var res = await fetch("/Product/Pdf", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(@Html.Raw(ViewBag.Products))
+            })
+            .then(res => res.blob())
+            .then(res => {
+                const url = window.URL.createObjectURL(res);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "report.pdf";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(err => {
+                console.error(err)
+            });
+        }
+
+        async function template() {
+            var res = await fetch("/Product/Template", {
+                method: "GET"
+            })
+            .then(res => res.blob())
+            .then(res => {
+                const url = window.URL.createObjectURL(res);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "template.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(err => {
+                console.error(err)
+            });
+        }
+    </script>
+}
