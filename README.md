@@ -1,6 +1,6 @@
 # TestMVC Project
 
-A .NET 9.0 ASP.NET Core MVC application with LDAP authentication and email functionality.
+A simple DOTNET MVC Web Application for learning purpose.
 
 ## Prerequisites
 
@@ -37,7 +37,7 @@ dotnet build
 
 The project uses SQL Server with the connection string:
 ```
-Server=CROPCIRCLE-WORK\CROPCIRCLE;Database=LEARNING;Trusted_Connection=True;TrustServerCertificate=True;
+Server=(yourserver);Database=LEARNING;Trusted_Connection=True;TrustServerCertificate=True;
 ```
 
 **For local development, update `appsettings.json`:**
@@ -97,7 +97,7 @@ homeDirectory: /home/johndoe
 userPassword: 123
 ```
 
-#### Add LDAP Entries
+#### Add LDAP Entries (execute in docker terminal)
 
 **Add the organizational unit:**
 ```bash
@@ -182,62 +182,6 @@ The application will be available at:
 - **PDF Generation**: QuestPDF integration
 - **Excel Export**: ClosedXML integration
 - **Scheduled Tasks**: Background service with MyScheduler
-
-## Troubleshooting
-
-### Common Issues
-
-1. **LDAP Connection Failed**
-   - Ensure OpenLDAP container is running: `docker ps`
-   - Check LDAP port is accessible: `telnet localhost 389`
-
-2. **Database Connection Failed**
-   - Verify SQL Server is running
-   - Check connection string in `appsettings.json`
-   - Ensure database exists
-
-3. **Email Not Sending**
-   - Verify Mailhog container is running: `docker ps`
-   - Check Mailhog web UI at http://localhost:8025
-   - Ensure port 1025 is not blocked
-
-4. **Build Errors**
-   - Ensure .NET 9.0 SDK is installed: `dotnet --version`
-   - Restore packages: `dotnet restore`
-   - Clean and rebuild: `dotnet clean && dotnet build`
-
-### Useful Docker Commands
-
-```bash
-# List running containers
-docker ps
-
-# Stop containers
-docker stop l-ldap mailhog
-
-# Remove containers
-docker rm l-ldap mailhog
-
-# View container logs
-docker logs l-ldap
-docker logs mailhog
-```
-
-## Development
-
-### Project Structure
-- **Controllers/**: MVC Controllers (Home, Order, Product)
-- **Models/**: Data models and view models
-- **Views/**: Razor views
-- **Data/**: Database context, services, and utilities
-- **wwwroot/**: Static files (CSS, JS, images)
-
-### Key Dependencies
-- **Microsoft.EntityFrameworkCore**: ORM for database operations
-- **MailKit**: Email functionality
-- **System.DirectoryServices.Protocols**: LDAP integration
-- **QuestPDF**: PDF generation
-- **ClosedXML**: Excel file operations
 
 ## License
 
